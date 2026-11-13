@@ -1,24 +1,22 @@
 package com.gty.netsim.layer.medium.portdevice.signalgenerator;
 
-import com.gty.netsim.layer.medium.Medium;
-import com.gty.netsim.layer.medium.mediumport.MediumPort;
 import com.gty.netsim.layer.medium.portdevice.SignalDevice;
 import com.gty.netsim.layer.medium.signal.SignalPackage;
+import com.gty.netsim.layer.medium.spi.SignalPort;
 
 public abstract class SignalGenerator extends SignalDevice {
-    public SignalGenerator(Medium medium) {
-        super(medium);
+    public SignalGenerator(SignalPort port) {
+        super(port);
     }
 
     public abstract void generate(int duration);
 
     @Override
-    public void send(SignalPackage signalPackage) {
-        this.medium_port.sendSignal(signalPackage);
+    public void send(SignalPackage signal) {
+        transmit(signal);
     }
 
     @Override
-    public void recieve(SignalPackage signalPackage) {
-        return;
+    public void onSignal(SignalPackage signal, long delayNs) {
     }
 }

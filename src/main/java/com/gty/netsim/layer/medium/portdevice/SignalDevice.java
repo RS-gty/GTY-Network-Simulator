@@ -1,16 +1,21 @@
 package com.gty.netsim.layer.medium.portdevice;
 
-import com.gty.netsim.layer.medium.Medium;
-import com.gty.netsim.layer.medium.mediumport.MediumPort;
 import com.gty.netsim.layer.medium.signal.SignalPackage;
+import com.gty.netsim.layer.medium.spi.SignalPort;
+import com.gty.netsim.layer.medium.spi.SignalSink;
 
-public abstract class SignalDevice {
-    protected MediumPort medium_port;
-    public SignalDevice(Medium medium) {
-        this.medium_port = medium.getPort(this);
+import java.util.Objects;
+
+public abstract class SignalDevice implements SignalSink {
+    protected final SignalPort port;
+
+    public SignalDevice(SignalPort port) {
+        this.port = Objects.requireNonNull(port, "port");
     }
 
-    public abstract void send(SignalPackage signalPackage);
+    protected final void transmit(SignalPackage signal) {
+        port.send(signal);
+    }
 
-    public abstract void recieve(SignalPackage signalPackage);
+    public abstract void send(SignalPackage signal);
 }

@@ -29,7 +29,6 @@ public final class SchedulerSelfCheck {
         report();
     }
 
-    /** 乱序登记，必须按时间先后执行，而不是登记顺序。 */
     private static void timeOrder() {
         Scheduler scheduler = new Scheduler();
         List<Integer> order = new ArrayList<>();
@@ -42,7 +41,6 @@ public final class SchedulerSelfCheck {
         check("时刻顺序执行后 nowNs 停在 30", scheduler.nowNs() == 30);
     }
 
-    /** 同一时刻的事件按登记顺序（FIFO）执行，保证可复现。 */
     private static void fifoAtSameInstant() {
         Scheduler scheduler = new Scheduler();
         List<Integer> order = new ArrayList<>();
@@ -54,7 +52,6 @@ public final class SchedulerSelfCheck {
         check("同一时刻按登记顺序执行", order.equals(List.of(1, 2, 3)));
     }
 
-    /** scheduleIn 是相对当前时间的时延。 */
     private static void relativeScheduling() {
         Scheduler scheduler = new Scheduler();
         List<Long> seen = new ArrayList<>();
@@ -64,7 +61,6 @@ public final class SchedulerSelfCheck {
         check("scheduleIn(100) 在 100ns 触发", seen.equals(List.of(100L)));
     }
 
-    /** runUntil 的 horizon 只限制“执行到哪”，不把时钟推到 horizon。 */
     private static void clockStopsAtLastEvent() {
         Scheduler scheduler = new Scheduler();
         scheduler.scheduleAt(50, () -> { });
@@ -74,7 +70,6 @@ public final class SchedulerSelfCheck {
         check("时钟停在 50ns 而非 10000ns", scheduler.nowNs() == 50);
     }
 
-    /** 事件执行中新登记的事件，随 horizon 决定是否在本次运行内执行。 */
     private static void chainedScheduling() {
         Scheduler scheduler = new Scheduler();
         List<Long> seen = new ArrayList<>();
@@ -90,7 +85,6 @@ public final class SchedulerSelfCheck {
         check("链式事件在 15ns 执行", seen.equals(List.of(10L, 15L)) && scheduler.nowNs() == 15);
     }
 
-    /** 取消后不再执行；重复取消返回 false。 */
     private static void cancellation() {
         Scheduler scheduler = new Scheduler();
         List<Integer> order = new ArrayList<>();
@@ -105,7 +99,6 @@ public final class SchedulerSelfCheck {
         check("firedCount 不含已取消事件", scheduler.firedCount() == 2);
     }
 
-    /** 调度到过去必须报错，而不是被悄悄接受。 */
     private static void rejectPastTime() {
         Scheduler scheduler = new Scheduler();
         scheduler.scheduleAt(50, () -> { });
@@ -128,7 +121,6 @@ public final class SchedulerSelfCheck {
         check("负时延抛 IllegalArgumentException", negativeDelay);
     }
 
-    /** 事件执行过程中再次调用 run* 必须被拒绝。 */
     private static void rejectReentrancy() {
         Scheduler scheduler = new Scheduler();
         boolean[] threw = {false};

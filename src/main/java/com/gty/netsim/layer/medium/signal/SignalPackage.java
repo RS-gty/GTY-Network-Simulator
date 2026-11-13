@@ -1,23 +1,21 @@
 package com.gty.netsim.layer.medium.signal;
 
-import java.util.ArrayDeque;
+public record SignalPackage(double[] samples) {
 
-public class SignalPackage {
-    ArrayDeque<Double> signalData;
-
-    public SignalPackage() {
-        signalData = new ArrayDeque<>();
+    public SignalPackage {
+        samples = samples.clone();
     }
 
-    public SignalPackage(ArrayDeque<Double> signal_data) {
-        this.signalData = signal_data;
+    public double currentSignal() {
+        return samples[0];
     }
 
-    public double current_signal(){
-        return signalData.getFirst();
+    public int size() {
+        return samples.length;
     }
 
-    public ArrayDeque<Double> getSignalData() {
-        return signalData;
+    @Override
+    public double[] samples() {
+        return samples.clone();
     }
 }

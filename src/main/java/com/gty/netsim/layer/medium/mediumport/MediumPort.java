@@ -1,35 +1,44 @@
 package com.gty.netsim.layer.medium.mediumport;
 
 import com.gty.netsim.layer.medium.Medium;
-import com.gty.netsim.layer.medium.portdevice.SignalDevice;
 import com.gty.netsim.layer.medium.signal.SignalPackage;
+import com.gty.netsim.layer.medium.spi.SignalPort;
+import com.gty.netsim.layer.medium.spi.SignalSink;
 
-import java.util.ArrayDeque;
+import java.util.Objects;
 
-public class MediumPort {
-    private int id;
-    private Medium medium;
-    private SignalDevice signalDevice;
+public class MediumPort implements SignalPort {
+    private final int id;
+    private final Medium medium;
+    private SignalSink sink;
 
-    public MediumPort(Medium medium, SignalDevice device, int id) {
-        this.medium = medium;
-        this.signalDevice = device;
+    public MediumPort(Medium medium, int id) {
+        this.medium = Objects.requireNonNull(medium, "medium");
         this.id = id;
     }
 
-    public int getId() {
+    public void bindSink(SignalSink sink) {
+        if (this.sink != null) {
+            throw new IllegalStateException("端口 " + id + " 已绑定设备");
+        }
+        this.sink = Objects.requireNonNull(sink, "sink");
+    }
+
+    @Override
+    public int id() {
         return id;
     }
 
-    public void setId(short id) {
-        this.id = id;
+    @Override
+    public void send(SignalPackage signal) {
+        medium.transmit(this, signal);
     }
 
-    public void sendSignal(SignalPackage signalPackage) {
-        this.medium.send(this, signalPackage);
-    }
-
-    public void receiveSignal(SignalPackage signalPackage, long delay) {
-        this.signalDevice.recieve(signalPackage);
+    @Override
+    public void deliver(SignalPackage signal, long delayNs) {
+        if (sink == null) {
+            throw new IllegalStateException("端口 " + id + " 尚未绑定设备");
+        }
+        sink.onSignal(signal, delayNs);
     }
 }
